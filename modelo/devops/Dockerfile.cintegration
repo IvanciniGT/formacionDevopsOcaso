@@ -1,0 +1,31 @@
+# El objetivo de este fichero es generar una NUEVA IMAGEN DE CONTENEDOR...
+# Que al ejecutar un contenedor con esta imagen de contenedor 
+# Me devuelve un 0 si las pruebas han ido bin... o un código no 0 si las pruebas han ido mal
+
+# Esta imagen hará falta dentro del proceso de Integración Continua de mi modelo
+
+# Preparar el entorno que necesito.
+## Partiendo de una imagen que ya tenga preinstalado python 3.12
+FROM python:3.12
+## Copio un fichero que incluye las dependencias que tiene mi proyecto
+COPY requirements.txt /tmp/requirements.txt
+## Solicito la instalación de esas dependencias
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+
+# Configuro mi ejecución
+
+## Defino unas variables de entorno para mi contenedor
+ENV RUTA_DATOS=/datos
+ENV RUTA_DESTINO_MODELO=/exportacion
+
+## Defino unos volumenes para mi contenedor
+VOLUME ["/datos"]
+VOLUME ["/exportacion"]
+
+## Establezco que cuando un comando sea ejecutado en este contenedor, por defecto se ejecute en la carpeta /modelo
+WORKDIR /modelo
+
+## Establkezco que cuando se solicite el arranque de un contenedor creado desde esta imagen
+## que por defecto se ejecute el comando:
+CMD /bin/bash -c "ejecutar_pruebas.sh"
