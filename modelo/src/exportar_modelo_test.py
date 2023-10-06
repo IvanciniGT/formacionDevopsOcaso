@@ -17,7 +17,7 @@ class CreacionModeloTest(unittest.TestCase):
         
         # Importarlo
         fichero = open(RUTA_DESTINO_MODELO, 'rb')
-        modelo_exportado = pickle.load(fichero)
+        modelo_exportado = pickle.load(fichero+"/modelo.sav")
         fichero.close()
 
         # Hago una prueba

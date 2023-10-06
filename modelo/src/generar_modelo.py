@@ -49,7 +49,7 @@ def generarModelo(docs_train, y_train):
 
 def exportarModelo(modelo, ruta_destino_modelo):
     # Exportar el modelo
-    fichero = open(ruta_destino_modelo, 'wb')
+    fichero = open(ruta_destino_modelo+"/modelo.sav", 'wb')
     pickle.dump(modelo, fichero)
     fichero.close()
 

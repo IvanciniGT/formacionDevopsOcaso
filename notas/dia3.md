@@ -5,6 +5,10 @@ Datos de entrenamiento irán evolucionando
     Su propio proyecto -> Artefacto (DATOS... fichero... BBDD)
 
     En un momento dado, si hay nuevos datos -> Generar un modelo nuevo
+    CI
+        CDelivery
+            -> Actualizar en el proyecto modelo, el submodulo de los datos, a la nueva versión!
+                Jenkins debe arrancar este proceso, en cuanto hay. una nuevo commit en git en el repo DATOS en la rama desarrollo, que lleva un tag v.1.2.1
 
 Generación del Modelo
     Algoritmos... -> Modelo (Artefacto-pickle)
@@ -131,8 +135,8 @@ PASO 5: Generar un informe con el resultado de las pruebas de calidad de código
         - Recomendaciones del lenguaje: Acabar con una linea en blanco. 
                                         1 espacio en blanco delante y detras de operadores
                                         Utilizar snake-case para nombrar las variables
-        - Complejidad cognitiva: Cómo de complejo es para un humano entender un código  ->
-        - Complejidad ciclomática: Cuántos caminos puede tomar ese código al ejecutarse -> 
+        - Complejidad cognitiva: Cómo de complejo es para un humano entender un código
+        - Complejidad ciclomática: Cuántos caminos puede tomar ese código al ejecutarse -> Número mínimo de pruebas que necesito hacer
         - Duplicaciones de código
         - Vulnerabilidades
 El propio pipeline acaba con estado: SUCCESS, FAILURE < - Jenkins

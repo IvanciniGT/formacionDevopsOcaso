@@ -1,0 +1,31 @@
+podTemplate(yaml: '''
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: sonar
+    image: sonarsource/sonar-scanner-cli
+    command:
+    - sleep
+    args:
+    - infinity
+  - name: python
+    image: python:3.12
+    command:
+    - sleep
+    args:
+    - infinity
+''') {
+    node(POD_LABEL) {
+       checkout scm
+       sh 'RUN pip install --no-cache-dir -r devops/requirements.txt'
+       if( buildingTag() ){
+           echo 'Generando nueva release de los datos'
+           sh 'git switch master'
+           sh 'git merge develop'
+           sh 'git push'
+           sh 'git push tags'
+       }
+       
+    }
+}

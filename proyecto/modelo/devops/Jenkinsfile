@@ -1,0 +1,37 @@
+/// Integración Continua del modelo
+podTemplate(yaml: '''
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: sonar
+    image: sonarsource/sonar-scanner-cli
+    command:
+    - sleep
+    args:
+    - infinity
+  - name: python
+    image: python:3.12
+    command:
+    - sleep
+    args:
+    - infinity
+''') {
+    node(POD_LABEL) {
+       container('sonar'){
+        checkout scm // Extraer el repo de git
+        withSonarQubeEnv('ElSonarDeMiEmpresa'){ // Establecemos los datos de conexión al sonar
+            // Solicitando un scanner con Sonar
+            sh "sonar-scanner"
+        }
+        // Podría estar haciendo más tareas ... mientras se ejecuta el análisis del proyecto en Sonar...
+        timeout(time: 1, unit: 'HOURS') { // Esperar la respuesta del sonar
+            waitForQualityGate abortPipeline: true
+        }            
+       }
+       container('python'){
+        sh 'RUN pip install --no-cache-dir -r devops/requirements.txt'
+        sh 'bin/ejecutar_pruebas.sh'
+       }
+    }
+}

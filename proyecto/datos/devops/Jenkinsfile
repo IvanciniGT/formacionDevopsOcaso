@@ -1,0 +1,34 @@
+podTemplate(yaml: '''
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: git
+    image: bitnami/git:latest
+    command:
+    - sleep
+    args:
+    - infinity
+''') {
+    node(POD_LABEL) {
+       checkout scm
+       if( buildingTag() ){
+//           withCredentials([usernamePassword(credentialsId: env.GIT_CREDENTIAL_ID, usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+               echo 'Generando nueva release de los datos'
+               echo 'Nos aseguramos de tener en local la rama develop'
+               echo 'Cambiamos a master'
+               sh 'git pull origin master'
+               sh 'git checkout master'
+               echo 'Llevamos lo último de develop'
+               sh 'git merge origin/develop'
+               sh '''cat <<EOF | git push
+ivanciniGT
+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
+EOF
+'''
+//               //sh 'git push tags'
+            //}
+       }
+       
+    }
+}

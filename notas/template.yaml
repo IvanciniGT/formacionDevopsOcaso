@@ -1,0 +1,179 @@
+# YAML. Spec 1.2
+# Formato / Lenguaje para estructurar información: JSON | XML
+
+# En un documento YAML, puedo poner comentarios... Aleluya!
+# En un fichero YAML, puedo tener muchos DOCUMENTOS YAML... cosa que ni en JSON ni en XML podía hacer
+# Cada documento va precedido de la secuencia de caracteres --- INICIO DE NUEVO DOCUMENTO
+# Eso es opcional para el primer documento
+... # Indican final de documento (OPCIONAL). En ficheros no tiene ninguna utilidad practica. Si en streaming
+# Entre una marca y otra pueden pasar horas
+---
+# Un segundo documento
+...
+---
+# Un tercer documento
+# Un documento YAML es UN NODO
+# Y en YAML hay 2 tipos de nodos: ESCALARES y de COLECCION
+---
+#. Escalares: Numeros
+3
+---
+-3
+---
+0.89
+---
+# Escalares: Boleanos
+true # TRUE True
+---
+false # False FALSE
+---
+# Ojo.. quizás en algún momento veais un documento que ponga cosas como:
+Yes
+Y
+yes
+no
+off
+on
+# Esto se permitía (y se interpretaba como valores booleanos en v1.1 de YAML... en la v 1.2 NO SON VALIDOS)
+---
+# Textos
+Esto "es 'un #texto
+---
+"Esto \"es 'un #texto"
+---
+'Esto "es ''un #texto'
+---
+# Sintaxis literal
+|
+    Empiezo a escribir un texto
+    Que puede tener caracteres raros: "'#\ñá
+    
+    Lo que quiera
+---
+# Sintaxis folded
+>   
+    Empiezo a escribir un texto
+    Que puede tener caracteres raros: "'#\ñá
+    
+    Lo que quiera
+---
+# COLECCION: Listas ordenadas y con MAPAS desordenados
+# Listas ordenadas:
+- item 1
+- 2
+- true
+-
+    - subitem1
+    - subitem2
+---
+# Mapas desordenados: Conjunto de valores identificados por una clave (lo que en python es un diccionario)
+clave1: valor1
+clave2: valor1
+clave3: 3
+clave4: true
+clave5: 
+    - item1
+    - item2
+clave6:
+    subclave1: 1
+    subclave2: false
+---
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+      - name: sonar
+        image: sonarsource/sonar-scanner-cli
+        command:
+            - sleep
+        args:
+            - infinity
+      - name: python
+        image: python:3.12
+        command:
+            - sleep
+        args:
+            - infinity
+---
+
+apiVersion: v1
+kind: Pod
+metadata: 
+    name: prueba
+spec:
+  containers:
+      - name: python
+        image: python:3.12
+        command:
+            - sleep
+        args:
+            - infinity
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+    name: plantilla-pod
+
+spec:
+  replicas: 2
+  
+  selector:
+    matchLabels:
+      modelo: A
+  
+  template: 
+
+    metadata:
+      name: miplantilla
+      labels:
+        modelo: A
+        
+    spec:
+        containers:
+            - name: python
+              image: python:3.12
+              command:
+                  - sleep
+              args:
+                  - infinity
+              resources:
+                requests:
+                    cpu:    {{ .Values.servicio.request.cpu }}
+                    memory: 4Gi
+                limits:
+                    cpu:    {{ .Values.servicio.limits.cpu }}
+                    memory: 4Gi
+              # Cada 3 segundos lo llamas.. y si 3 veces consecutivas no te contesta, 
+              # marcalo como que no esta vivo-> FALLIDO ... y crea un pod nuevo
+              livenessProbe:
+                  httpGet:
+                    path: /api/modelo?texto=lavabo
+                    port: 8080
+                  initialDelaySeconds: 3
+                  periodSeconds: 3    
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              # Cada 3 segundos lo llamas.. y si te contesta metelo en el balanceador
+              readinessProbe:
+                  httpGet:
+                    path: /api/modelo?texto=lavabo
+                    port: 8080
+                  initialDelaySeconds: 3
+                  periodSeconds: 3    
+                  timeoutSeconds: 1
+                  failureThreshold: 3                    
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+    name: balanceador
+
+spec:
+  selector:
+      modelo: A
+  
+  ports: 
+    - port: 8080
+      target: 8080
